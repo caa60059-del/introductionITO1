@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Introduce Yourself — Our Group</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f0f12;
+      --bg-card: #1a1a20;
+      --accent: #e8b86d;
+      --accent-soft: rgba(232, 184, 109, 0.15);
+      --text: #f0ebe3;
+      --text-muted: #9a958c;
+      --border: rgba(232, 184, 109, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-soft), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(232, 184, 109, 0.08), transparent),
+        radial-gradient(ellipse 50% 30% at 0% 80%, rgba(232, 184, 109, 0.06), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(232, 184, 109, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232, 184, 109, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-weight: 300;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+      justify-items: center;
+    }
+    @media (max-width: 900px) {
+      .members-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 550px) {
+      .members-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 340px;
+        margin: 0 auto;
+      }
+    }
+
+    .member-card {
+      cursor: pointer;
+      perspective: 1000px;
+      aspect-ratio: 3/4;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .member-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .member-card.flipped .member-inner {
+        transform: rotateY(180deg);
+    }
+
+    .member-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .member-face.front {
+      background: var(--bg-card);
+    }
+
+    .member-face.back {
+      background: linear-gradient(145deg, #22222a 0%, #1a1a20 100%);
+      transform: rotateY(180deg);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+    .member-face.back::-webkit-scrollbar {
+      width: 6px;
+    }
+    .member-face.back::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+      border-radius: 3px;
+    }
+    .member-face.back::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 3px;
+    }
+    .member-photo-wrap {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .member-photo-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+      opacity: 0.8;
+    }
+
+    .member-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .member-card:hover .member-photo {
+      transform: scale(1.08);
+    }
+    .member-name-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.25rem 1rem 1rem;
+      z-index: 2;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .tap-hint {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 2;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.7);
+      background: rgba(0,0,0,0.4);
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+    .back-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .info-row {
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .info-label {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.65rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .info-value {
+      color: var(--text);
+      font-weight: 500;
+    }
+    .flip-back-hint {
+      margin-top: auto;
+      padding-top: 0.75rem;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="bg-grid"></div>
+
+  <div class="container">
+    <header>
+      <h1 class="title">Introduce Yourself</h1>
+      <p class="subtitle">Meet Our Group — Click a photo to reveal</p>
+    </header>
+
+    <div class="members-grid">
+      <!-- Member 1 -->
+      <div class="member-card" tabindex="0" role="button" aria-label="View Quenie Ann's info">
+        <div class="member-inner">
+          <div class="member-face front">
+            <div class="member-photo-wrap">
+              <span class="tap-hint">Tap to flip</span>
+              <img class="member-photo" src="c:\Users\NJ651WSM\Downloads\index.html2\e6ab3700-dd91-4920-aaad-5158c70504c5.jpg" alt="Quenie Ann">
+            </div>
+            <div class="member-name-overlay">Quenie Ann M. Edora</div>
+          </div>
+          <div class="member-face back">
+            <div class="back-title">Meet Quenie Ann</div>
+            <div class="info-row">
+              <div class="info-label">Name</div>
+              <div class="info-value">EDORA, QUENIE ANN M</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Age</div>
+              <div class="info-value">19</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birth</div>
+              <div class="info-value">November 25, 2006</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Adress</div>
+              <div class="info-value">Sitio Mata Palangoy Binangonan Rizal</div>
+               </div>
+              <div class="info-row">
+                <div class="info-label">Birthday</div>
+              <div class="info-value">November 25, 2006</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Birth place</div>
+              <div class="info-value">Daguit Labo Camarrines Norte</div>
+               </div>
+               <div class="info-row">
+                <div class="info-label">Motto in Life</div>
+              <div class="info-value">Trust the Process</div>
+              </div>
+               <div class="info-row">
+                <div class="info-label">Hobby</div>
+              <div class="info-value">Watch movies, reading</div>
+              </div>
+               <div class="info-row">
+                <div class="info-label">Talent</div>
+              <div class="info-value">Cooking</div>
+              </div>
+               <div class="info-row">
+                <div class="info-label">Dream Course</div>
+              <div class="info-value">Hospitality Management</div>
+              </div>
+               <div class="info-row">
+                <div class="info-label">Why did you choose that course</div>
+              <div class="info-value">I choose Hospitality Management because I enjoy working with people, creating positive experiences, and learning about the tourism and service industry. This course helps develop skills oin communication, leadership, organization, and customer service, which are useful in many careers such as hotels, restaurants, events, and travel.</div>
+               </div>
+               <div class="info-row">
+                <div class="info-label">Parents</div>
+              <div class="info-value">Cathleen Pagaduan/Joseph Edora</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Parents Work</div>
+              <div class="info-value">House wife</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Crush</div>
+              <div class="info-value">Donny Pangilinan</div>
+              </div>
+            <div class="flip-back-hint">Click again to flip back</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member 2 -->
+      <div class="member-card" tabindex="0" role="button" aria-label="View member info">
+        <div class="member-inner">
+          <div class="member-face front">
+            <div class="member-photo-wrap">
+              <span class="tap-hint">Tap to flip</span>
+              <img class="member-photo" src="projects/c-Users-NJ651WSM-cursor/assets/c__Users_NJ651WSM_AppData_Roaming_Cursor_User_workspaceStorage_fda8496228f5691e64c3e24f2aaa64f8_images_e48e0978-32f2-4dc6-9a3f-9c9b98165ea5-2a25c845-bb58-49b5-b532-fe8eb634a0b6.png" alt="Leizl R. Salon">
+            </div>
+            <div class="member-name-overlay">Leizl R. Salon</div>
+          </div>
+          <div class="member-face back">
+            <div class="back-title">Meet Leizl</div>
+            <div class="info-row">
+              <div class="info-label">Name</div>
+              <div class="info-value">Leizl R. Salon</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Age</div>
+              <div class="info-value">18</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Address</div>
+              <div class="info-value">Sitio Mata Palangoy Binangonan Rizal</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birthday</div>
+              <div class="info-value">May 4, 2007</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birth place</div>
+              <div class="info-value">Pasig City (Hospital)</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Motto in Life</div>
+              <div class="info-value">Learn to rest not to quit</div>
+            </div>
+           <div class="info-row">
+              <div class="info-label">Hobby</div>
+              <div class="info-value">Watching movies and eating</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Talent</div>
+              <div class="info-value">Cooking</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Dream Course</div>
+              <div class="info-value">Hospitality Management</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Why did choose that course</div>
+              <div class="info-value">Choosing this program was a natural decision for me and I believe that a career in Hospitality will not only allow me to follow my passion but also contribute possible to people's lives by creating enjoyable and memorable experiences</div>
+            </div>
+             <div class="info-row">
+              <div class="info-label">Parents</div>
+              <div class="info-value">Zenaida Redilla/Antonio Salon</div>
+            </div>
+             <div class="info-row">
+              <div class="info-label">Parents work</div>
+              <div class="info-value">Guard/Construction Working</div>
+            </div>
+             <div class="info-row">
+              <div class="info-label">Crush</div>
+              <div class="info-value">N/A</div>
+            </div>
+            <div class="flip-back-hint">Click again to flip back</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member 3 -->
+      <div class="member-card" tabindex="0" role="button" aria-label="View member info">
+        <div class="member-inner">
+          <div class="member-face front">
+            <div class="member-photo-wrap">
+              <span class="tap-hint">Tap to flip</span>
+              <img class="member-photo" src=""c:\Users\NJ651WSM\Downloads\kc.jpg alt="Kristine Cassandra B. Magalona">
+            </div>
+            <div class="member-name-overlay">Kristine Cassandra B. Magalona</div>
+          </div>
+          <div class="member-face back">
+            <div class="back-title">Meet Kristine</div>
+            <div class="info-row">
+              <div class="info-label">Name</div>
+              <div class="info-value">Kristine Cassandra B. Magalona</div>
+                </div>
+            <div class="info-row">
+              <div class="info-label">Age</div>
+              <div class="info-value">19</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Adress</div>
+              <div class="info-value">Sitio Mata Ibabaw Palangoy Binangonan Rizal</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birthday</div>
+              <div class="info-value">November 26,2006</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birth place</div>
+              <div class="info-value">Quezon City</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Motto in life</div>
+              <div class="info-value">Every person has a different pace so don't rush</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Hobby</div>
+              <div class="info-value">Gamming, Ready</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Talent</div>
+              <div class="info-value">Cooking</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Dream Course</div>
+              <div class="info-value">Hospitality Management</div>
+            </div>
+        <div class="info-row">
+              <div class="info-label">Why did you choose that course</div>
+              <div class="info-value">To pursue my dream job to work at a cruise ship</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Parents</div>
+              <div class="info-value">Marjorie Brazil Magalona/Mark Joseph Magalona</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Parents work</div>
+              <div class="info-value">Grab Rider</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Crush</div>
+              <div class="info-value">Haruto Watanabe</div>
+            </div>
+            <div class="flip-back-hint">Click again to flip back</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member 4 -->
+      <div class="member-card" tabindex="0" role="button" aria-label="View member info">
+        <div class="member-inner">
+          <div class="member-face front">
+            <div class="member-photo-wrap">
+              <span class="tap-hint">Tap to flip</span>
+              <img class="member-photo" src="projects/c-Users-NJ651WSM-cursor/assets/c__Users_NJ651WSM_AppData_Roaming_Cursor_User_workspaceStorage_fda8496228f5691e64c3e24f2aaa64f8_images_3858e1f9-532e-4c48-9e51-cc002413ea5c__1_-d754c49c-0853-4c01-9582-f8e8261c71e4.png" alt="Princess Anne V. San Jose">
+            </div>
+            <div class="member-name-overlay">Princess Anne V. San Jose</div>
+          </div>
+          <div class="member-face back">
+            <div class="back-title">Meet Princess</div>
+            <div class="info-row">
+              <div class="info-label">Name</div>
+              <div class="info-value">Princess Anne V. San Jose</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Age</div>
+              <div class="info-value">18</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Adress</div>
+              <div class="info-value">Sitio Burol May-Iba, Teresa Rizal</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birthday</div>
+              <div class="info-value">July 10, 2007</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birth place</div>
+              <div class="info-value">May-Iba, Teresa Rizal</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Motto in life</div>
+              <div class="info-value">You only live once</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Hobby</div>
+              <div class="info-value">Playing Music</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Talent</div>
+              <div class="info-value">Cooking</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Dream Course</div>
+              <div class="info-value">Chief Hospitality Management</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Why did you choose that course</div>
+              <div class="info-value">I choose the HM course because I enjoy cooking and it offer many job opportunities in the hospitality management</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Parents</div>
+              <div class="info-value">Maileen Vilanueva/Freddie San Jose</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Parents work</div>
+              <div class="info-value">Canteener/Traffic Enforces</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Crush</div>
+              <div class="info-value">My Lover</div>
+            </div>
+            <div class="flip-back-hint">Click again to flip back</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member 5 -->
+      <div class="member-card" tabindex="0" role="button" aria-label="View member info">
+        <div class="member-inner">
+          <div class="member-face front">
+            <div class="member-photo-wrap">
+              <span class="tap-hint">Tap to flip</span>
+              <img class="member-photo" src="projects/c-Users-NJ651WSM-cursor/assets/c__Users_NJ651WSM_AppData_Roaming_Cursor_User_workspaceStorage_fda8496228f5691e64c3e24f2aaa64f8_images_5c3cdab6-659f-4818-90bf-75c4149771c1__1_-4df2b41c-0b91-417f-85ea-ae763c282b4b.png" alt="Vince L. Patulin">
+            </div>
+              <div class="member-name-overlay">Vince L. Patulin</div>
+          </div>
+          <div class="member-face back">
+            <div class="back-title">Meet Vince</div>
+            <div class="info-row">
+              <div class="info-label">Name</div>
+              <div class="info-value">Vince L. Patulin</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Age</div>
+              <div class="info-value">19</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Adress</div>
+              <div class="info-value">Sitio sapo brgy Santa Cruz Antipolo</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birthday</div>
+              <div class="info-value">December 31, 2006</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Birth place</div>
+              <div class="info-value">Antipolo City</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Motto in life</div>
+              <div class="info-value">Time is gold</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Hobby</div>
+              <div class="info-value">Sketching</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Talent</div>
+              <div class="info-value">Value scale(graphite/charcoal drawing)</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Dream Course</div>
+              <div class="info-value">Tourism</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Why did you choose that course</div>
+              <div class="info-value">I am interested in the business side of tourism and the challenges of managing a successful tourism operation. I believe that my skills in organization, marketing, and customer service will be valuable in this field. Finally, I am excited about the opportunity to work in a fast-paced and ever-changing imdustyry</div>
+            </div>
+             <div class="info-row">
+              <div class="info-label">Parents</div>
+              <div class="info-value">Patulin Emma/Patulin Ernesto</div>
+            </div>
+             <div class="info-row">
+              <div class="info-label">Parents work</div>
+              <div class="info-value">House wife, handicrafts/Construction</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Crush</div>
+              <div class="info-value">My wife</div>
+            </div>
+            <div class="flip-back-hint">Click again to flip back</div>
+          </div>
+        </div>
+      </div>
+       </div>
+
+    <footer>
+      <p>Introduce Yourself — Our Group • 5 Members</p>
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll('.member-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        this.classList.toggle('flipped');
+      });
+      card.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.classList.toggle('flipped');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
